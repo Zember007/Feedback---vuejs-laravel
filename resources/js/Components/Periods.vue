@@ -1,0 +1,185 @@
+<template>
+    <div class="stat__container">
+        <div class="stat__select" @click="isOpen = !isOpen" v-click-outside="onClickOutside">
+            <div class="stat__heading">
+                <a href="#" class="stat__periods-title">{{ title }}</a>
+                <svg data-v-9ff0f06e="" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+                    preserveAspectRatio="xMidYMid meet" version="1.0" viewBox="0 0 120.0 112.8" zoomAndPan="magnify"
+                    original_string_length="13" style="fill: rgb(21, 108, 176);" width="30" height="30">
+                    <g data-v-9ff0f06e="" id="__id102_snwjr00tiq">
+                        <path data-v-9ff0f06e=""
+                            d="M113.818,64.669V30.346c0-4.233-1.648-8.212-4.642-11.206c-2.994-2.993-6.973-4.642-11.205-4.642h-6.524v-2.876 c0-2.209-1.791-4-4-4s-4,1.791-4,4v2.876H62.909v-2.876c0-2.209-1.791-4-4-4s-4,1.791-4,4v2.876H34.37v-2.876c0-2.209-1.791-4-4-4 s-4,1.791-4,4v2.876h-6.524c-4.231,0-8.21,1.648-11.205,4.642C5.648,22.134,4,26.113,4,30.346v59.137 c0,4.233,1.648,8.212,4.642,11.206c2.994,2.993,6.973,4.642,11.204,4.642h44.675c5.717,9.032,15.79,15.047,27.247,15.047 c17.773,0,32.232-14.459,32.232-32.231C124,78.897,120.079,70.552,113.818,64.669z M14.298,24.798 c1.483-1.482,3.453-2.299,5.548-2.299h6.524v2.877c0,2.209,1.791,4,4,4s4-1.791,4-4v-2.877h20.539v2.877c0,2.209,1.791,4,4,4 s4-1.791,4-4v-2.877h20.538v2.877c0,2.209,1.791,4,4,4s4-1.791,4-4v-2.877h6.524c2.095,0,4.066,0.816,5.548,2.299 c1.482,1.482,2.298,3.452,2.298,5.548v12.441H12V30.346C12,28.25,12.816,26.28,14.298,24.798z M19.846,97.33 c-2.095,0-4.065-0.816-5.547-2.299C12.816,93.549,12,91.579,12,89.483V50.787h93.818v8.356c-4.249-2.067-9.017-3.229-14.051-3.229 c-17.772,0-32.23,14.459-32.23,32.232c0,3.19,0.473,6.271,1.34,9.184H19.846z M91.768,112.377c-13.361,0-24.23-10.87-24.23-24.231 c0-13.361,10.87-24.232,24.23-24.232c13.362,0,24.232,10.871,24.232,24.232C116,101.507,105.129,112.377,91.768,112.377z"
+                            style="fill: inherit;"></path>
+                        <path data-v-9ff0f06e=""
+                            d="M95.768,86.489V74.141c0-2.209-1.791-4-4-4s-4,1.791-4,4v14.005c0,1.061,0.421,2.079,1.172,2.829l6.178,6.177 c0.781,0.781,1.804,1.171,2.828,1.171s2.048-0.391,2.829-1.172c1.562-1.562,1.562-4.095,0-5.657L95.768,86.489z"
+                            style="fill: inherit;"></path>
+                    </g>
+                </svg>
+            </div>
+            <transition name="fade" appear>
+                <div class="stat__periods" v-if="isOpen">
+                    <div v-for="(item, i) in periodsCalendar" :key="i" class="stat__dropdown flex gap-2">
+                        <button @click.prevent="sendDateFunc(item.period)" class="stat__opt">
+                            {{ item.title }}
+                        </button>
+                    </div>
+                </div>
+            </transition>
+        </div>
+    </div>
+</template>
+
+<script>
+import vClickOutside from 'click-outside-vue3'
+
+export default {
+    name: "periods",
+    props: ["title"],
+    emits: ["sendDate"],
+    directives: {
+        clickOutside: vClickOutside.directive
+    },
+    data() {
+        return {
+            isOpen: false,
+            nowDate: new Date(),
+            // календарный
+            periodsCalendar: [
+                {
+                    title: "Сегодня",
+                    period: {
+                        start: new Date(
+                            `${new Date().getMonth() + 1
+                            }-${new Date().getDate()}-${new Date().getFullYear()}`
+                        ).getTime(),
+                        end: new Date().getTime() + 24 * 60 * 60 * 1000,
+                    },
+                },
+                {
+                    title: "Вчера",
+                    period: {
+                        start: new Date(
+                            `${new Date().getMonth() + 1}-${new Date().getDate() - 1
+                            }-${new Date().getFullYear()}`
+                        ).getTime(),
+                        end: new Date(
+                            `${new Date().getMonth() + 1
+                            }-${new Date().getDate()}-${new Date().getFullYear()}`
+                        ).getTime(),
+                    },
+                },
+                {
+                    title: "Неделя",
+                    period: {
+                        start:
+                            new Date().getTime() -
+                            ([7, 1, 2, 3, 4, 5, 6][new Date().getDay()] - 1) *
+                            24 *
+                            60 *
+                            60 *
+                            1000,
+                        end: new Date().getTime() + 24 * 60 * 60 * 1000,
+                    },
+                },
+                {
+                    title: "2 недели",
+                    period: {
+                        start:
+                            new Date().getTime() -
+                            ([7, 1, 2, 3, 4, 5, 6][new Date().getDay()] + 6) *
+                            24 *
+                            60 *
+                            60 *
+                            1000,
+                        end: new Date().getTime() + 24 * 60 * 60 * 1000,
+                    },
+                },
+                {
+                    title: "Месяц",
+                    period: {
+                        start: new Date(
+                            `${new Date().getMonth() + 1
+                            }-01-${new Date().getFullYear()}`
+                        ).getTime(),
+                        end: new Date().getTime() + 24 * 60 * 60 * 1000,
+                    },
+                },
+            ],
+            // относительно сегодня
+            periods: [
+                {
+                    title: "24 часа",
+                    period: {
+                        start: new Date().getTime() - 24 * 60 * 60 * 1000,
+                        end: new Date().getTime() + 24 * 60 * 60 * 1000,
+                    },
+                },
+                {
+                    title: "Прошлые 24 часа",
+                    period: {
+                        start: new Date().getTime() - 2 * 24 * 60 * 60 * 1000,
+                        end: new Date().getTime(),
+                    },
+                },
+                {
+                    title: "7 дней",
+                    period: {
+                        start: new Date().getTime() - 7 * 24 * 60 * 60 * 1000,
+                        end: new Date().getTime() + 24 * 60 * 60 * 1000,
+                    },
+                },
+                {
+                    title: "14 дней",
+                    period: {
+                        start: new Date().getTime() - 14 * 24 * 60 * 60 * 1000,
+                        end: new Date().getTime() + 24 * 60 * 60 * 1000,
+                    },
+                },
+                {
+                    title: "30 дней",
+                    period: {
+                        start: new Date().getTime() - 30 * 24 * 60 * 60 * 1000,
+                        end: new Date().getTime() + 24 * 60 * 60 * 1000,
+                    },
+                },
+            ],
+        };
+    },
+    methods: {
+        sendDateFunc(period) {
+            this.$emit("sendDate", period);
+        },
+        onClickOutside(event) {
+            this.isOpen = false;
+        }
+    },
+};
+</script>
+
+<style>
+.stat__container {
+    position: relative;
+}
+
+.stat__select {
+    position: absolute;
+    transform: translateY(-50%);
+    padding: 5px 10px;
+    border-radius: 10px;
+    background: #FFF;
+    width: 150px;
+    color: #156CB0;
+    font-size: 18px;
+    box-shadow: 0px 0px 12px -7px #000;
+    height: 40px;
+}
+
+.stat__heading {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    justify-content: space-between;
+}
+
+
+</style>
